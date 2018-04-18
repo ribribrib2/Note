@@ -203,8 +203,59 @@ CSS
             块级标签：设置高度，宽度，padding  margin
             
         8、padding  margin(0,auto)
+		
+		9、css重用
+			<style>
+				如果整个页面的宽度 > 900px时：
+				{
+					.c{
+					   共有 
+					}
+					.c1{
+						独有
+					}
+				}
+				
+				.c2{
+					独有
+				}
+			</style>
+			
+			<div class='c c1'></div>
+			<div class='c c2'></div>
+		10、自适应 和 改变大小变形
+			左右滚动条的出现
+			宽度，百分比
+			
+			页面最外层：像素的宽度 => 最外层设置绝对宽度
+			里面使用百分比
+			
+			自适应：media(针对不同的媒体类型定义不同的样式,比如屏幕像素大于300px显示绿色,小于300px显示黄色)
+			body {
+				background-color:lightgreen;
+			}
+
+			@media screen and (max-width: 300px) {
+				body {
+					background-color:lightblue;
+				}
+			}
+			
+		11、默认img标签，有一个1px的边框
+			img{
+				border: 0;
+			}
+			
+		12、position:
+			a. fiexd => 固定在页面的某个位置
+			
+			b. relative + absolute     #点赞,出现加1,需要使用这个组合,加1才会跟着点赞走.
+			
+				<div style='position:relative;'>
+					<div style='position:absolute;top:0;left:0;'></div>
+				</div>
             
-		9、常用语句
+		13、常用语句
 			background-color: gray;                       #背景颜色
 			background-image: url(/a.gif);                #背景图片
 			background-repeat: repeat-y;                  #y方向平铺           no-repeat-->不平铺
@@ -270,7 +321,17 @@ CSS
 							margin:0;
 							padding:0
 						}
+			三层层叠:
+					 -->第二第三层使用position: fixed
+					 第二层: left|right|top|bottom = 0    设置颜色、透明度和层叠
+					 第三层：设置宽和高 weight、height
+							 设置边距：top：100px; right: 50%; left: 50% margin-left: -1/2*weight; margin-right: -1/2*height   设置颜色、内容和层叠
      
+			opcity: 0.5                 #透明度    1表示完全遮住
+            z-index:数字                #层级顺序  拥有更高堆叠顺序的元素总是会处于堆叠顺序较低的元素的前面 
+            overflow: hidden,auto       #当内容溢出元素框时发生的事情  auto：如果超出元素框显示滚动条，hidden为超出元素不可见
+			overflow：scroll            #无论如何都有滚动条
+
     
     
     
