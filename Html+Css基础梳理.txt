@@ -1,0 +1,288 @@
+HTML
+    1、一套规则，浏览器认识的规则。
+    2、开发者：
+        学习Html规则
+        开发后台程序：
+            - 写Html文件（充当模板的作用） ******
+            - 数据库获取数据，然后替换到html文件的指定位置（Web框架）
+    3、本地测试
+         - 找到文件路径，直接浏览器打开
+         - pycharm打开测试
+    4、编写Html文件
+        - doctype对应关系
+        - html标签，标签内部可以写属性 ====> 只能有一个
+        - 注释：  <!--  注释的内容  -->
+    5、标签分类
+        - 自闭合标签
+            <meta charset="UTF-8">
+        - 主动闭合标签
+            <title>老男孩</title>
+    6、head标签
+		- <meta  -> 编码，跳转，刷新，关键字，描述，IE兼容
+				<meta http-equiv="X-UA-Compatible" content="IE=IE9;IE=IE8;" />
+		- title标签
+		- <link />     定义文档与外部资源的关系
+		- <style />    定义HTML文档样式信息
+		- <script>     定义客户端脚本，比如 JavaScript
+    7、body标签
+         - 图标，  &nbsp;  &gt;   &lt;
+         - p标签，段落
+         - br，换行
+         ======== 小总结  =====
+            所有标签分为：
+                块级标签： div（白板），H系列（加大加粗），p标签（段落和段落之间有间距）
+                行内标签： span（白板）
+            标签之间可以嵌套
+            标签存在的意义，css操作，js操作
+            ps:chorme审查元素的使用
+                - 定位
+                - 查看样式
+        - h系列
+        - div
+        - span
+        - input系列 + form标签  
+            input type='text'     - name属性，value="赵凡" 
+            input type='password' - name属性，value="赵凡" 
+            input type='submit'   - value='提交' 提交按钮，表单
+            input type='button'   - value='登录' 按钮
+            input type='radio'    - 单选框 value，checked="checked"，name属性（name相同则互斥）
+            input type='checkbox' - 复选框 value, checked="checked"，name属性（批量获取数据）
+            input type='file'     - 依赖form表单的一个属性 enctype="multipart/form-data"
+            input type='rest'     - 重置
+			
+			常用的11个属性：type、name、value、checked、accept、alt、src、disabled、readonly、size、maxlength  （属性使用时中间用空格隔开，非逗号）
+		
+		- textarea标签
+			<textarea >默认值</textarea>  - name属性 -row属性（行数）-cols属性（可见宽度）
+        - select标签            - name,内部option value, 提交到后台，size，multiple（多选）
+			<select>
+				<option>1</option>
+				<option>2</option>
+			</select>
+        
+        - a标签
+            - 跳转
+            - 锚     href='#某个标签的ID'    标签的ID不允许重复
+			
+			<a href="http://www.w3school.com.cn">W3School</a>
+            
+        - img 
+             src        引用该图像的文件的的绝对路径或相对路径
+             alt        当需要显示的图片找不到时显示什么内容 
+             title      当鼠标悬停在图片上时,需要弹出的描述框中显示什么内容。
+             
+        - 列表
+            ul          Unordered List 无序标签 点
+                li
+            ol          ordered lists  有序标签 数字
+                li
+            dl          definition list 定义标签 有缩进
+                dt
+                dd
+        - 表格
+            table
+                thead
+                    tr
+                        th
+                tbody
+                    tr
+                        td
+			单元格合并
+            colspan = ''  可横跨的列数
+            rowspan = ''  可横跨的行数
+        - label
+            用于点击文件，使得关联的标签获取光标
+            <label for="username">用户名：</label>
+            <input id="username" type="text" name="user" />
+        - fieldset  组合表单 
+            legend  定义标题
+	
+CSS
+    1、在标签上设置style属性：
+        background-color: #2459a2;
+        height: 48px;
+        ...
+		
+		<div style="background-color: bisque;font-size: 23px">123</div>   分号隔开
+    
+    2、编写css样式：
+        1. 标签的style属性
+        2. 写在head里面 style标签中写样式
+            - id选择区
+                #i1{
+                   background-color: #2459a2;
+                   height: 48px;
+                }
+				<div id="i1">123</div>
+                  
+            - class选择器 ******
+                .名称{
+                   ...
+                }
+                <标签 class='名称'> </标签>
+				
+				.pg_head{
+				   	background-color: bisque;
+				 	font-size: 33px
+					}				
+				<div class="pg_head">123</div>
+            
+            - 标签选择器
+				div{
+					...
+				}
+                所有div设置上此样式
+				
+				h1{
+					background-color: bisque;
+				}
+				<h1>12313</h1>
+            
+            - 层级选择器（空格） ******
+			    .c1 .c2 div{	
+			    }
+				
+				.css1 div{
+					background-color: #cccccc;
+				}
+				<div class="css1">
+					<div>
+						层级选择器
+					</div>
+				</div>
+				
+            - 组合选择器（逗号） ******
+				#c1,.c2,div{   
+			    }
+				同时适用#c1/.c2/div,用逗号分开的选择器都有效
+            
+            - 属性选择器 ******
+			    对选择到的标签再通过属性再进行一次筛选
+			    .c1[n='alex']{ width:100px; height:200px; }
+			   
+			    只对有 href 属性的锚（a 元素）应用样式:
+			    a[href] {color:red;}
+                   
+            PS:
+                - 优先级，标签上style优先，编写顺序，就近原则
+            
+        2.5 css样式也可以写在单独文件中
+            <link rel="stylesheet" href="commons.css" />
+			rel  定义链接的文件和HTML文档之间的关系
+            
+        3、注释
+            /*   */
+    
+        4、边框
+             - 宽度，样式，颜色  (border: 4px dotted red;)
+             - border-left
+        
+        5、 
+            height,               高度 百分比
+            width,                宽度 像素，百分比
+            text-align:ceter,     水平方向居中
+            line-height,          垂直方向根据标签高度
+            color,                字体颜色
+            font-size,            字体大小
+            font-weight,          字体加粗
+        
+        6、float
+            让标签浪起来，块级标签也可以堆叠
+            老子管不住：
+                <div style="clear: both;"></div>
+            
+        7、display
+            display: none; -- 让标签消失
+            display: inline;
+            display: block;
+            display: inline-block;
+                     具有inline,默认自己有多少占多少
+                     具有block，可以设置无法设置高度，宽度，padding  margin
+            ******
+            行内标签：无法设置高度，宽度，padding  margin
+            块级标签：设置高度，宽度，padding  margin
+            
+        8、padding  margin(0,auto)
+            
+		9、常用语句
+			background-color: gray;                       #背景颜色
+			background-image: url(/a.gif);                #背景图片
+			background-repeat: repeat-y;                  #y方向平铺           no-repeat-->不平铺
+			background-position: center;                  #背景图像相对位置    100% 100%-->会使图像的右下角放在右边距的右下角 
+			
+			text-indent: 1em;                             #缩进                字体大小是16px，那么1em=16px(浏览器默认)
+			text-align: center                            #水平方向居中
+			line-height                                   #垂直方向根据标签高度
+			
+			font-family: Georgia                          #字体
+			font-style: normal;                           #字体风格            italic - 文本斜体显示   oblique - 文本倾斜显示
+			font-weight: bold;                            #字体加粗
+			font-size: 60px;                              #字体加粗
+			
+			a:link    {color:#FF0000;}                    #未被访问的链接
+			a:visited {color:#00FF00;}                    #已被访问的链接
+			a:hover   {color:#FF00FF;}                    #鼠标指针移动到链接上
+			a:active  {color:#0000FF;}                    #正在被点击的链接
+			
+			border: 1px solid blue;                       #边框1px,实线,蓝色
+			border-style: solid;                          #边框分开设置
+			border-width: 1px;
+			border-color: blue;
+			border-collapse: collapse;                    #设置表格的边框是否被合并为一个单一的边框
+			
+			height: 50px;                                 #高度50px
+			width: 100%;                                  #宽度100%      比如放在table中  table左到右占比100%
+			text-align: right;                            #text-align 和 vertical-align 属性设置表格中文本的对齐方式(水平方向&&垂直方向)
+			vertical-align: bottom;                       
+    
+			padding: 15px;                                #内容与边框的距离(内边距)    10% 设置为父元素width的 10%
+			margin: 0.5em;                                #外边距
+			
+			一个元素框 = 元素宽度 + 左内边距 + 右内边距 + 左外边距 + 右外边距
+			合并后的外边距的高度 = 两个发生合并的外边距的高度中的较大者
+			
+			position: fixed;                              #固定在浏览器页面某个位置,例如回到顶部        脱离正常文档流  拖动滚动条不会移动
+			position: absolute;                           #绝对位置 ,z-index设置层叠,越大显示越靠前     脱离正常文档流  拖动滚动条会移动
+			position: relative                            #相对定位                                     遵循正常文档流  拖动滚动条会移动
+			
+			display: none;          --> 让标签消失,标签内容也不显示
+            display: inline;        --> 行内标签                      
+			display: block;         --> 块级标签                   
+            display: inline-block;  --> 具有inline,默认自己有多少占多少
+                                        具有block，可以设置无法设置高度，宽度，padding  margin
+            ******
+            行内标签：不能更改元素的height，width的值，大小由内容撑开.  可以使用padding，margin的left和right产生边距效果
+            块级标签：能更改元素的height,width的值,可以设置padding，margin的各个属性值，top，left，bottom，right都能够产生边距效果.
+			
+			float: right                                  #靠右浮动,不在文档流中
+			float: left                                   #靠左浮动,不在文本流中
+			clear: both;	                              #在左右两侧均不允许浮动元素
+			
+			导航栏有白边: 
+						div{
+							background-color: #cccccc;
+							width: 100%;
+							margin: 0;
+							padding: 0;
+							height: 100px;
+						}
+						body{
+							margin:0;
+							padding:0
+						}
+     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
