@@ -38,6 +38,12 @@ JavaScript
     基本数据类型
         数字
             a = 18;
+			parseInt(..)    将某值转换成数字，不成功则NaN
+			parseFloat(..) 	将某值转换成浮点数，不成功则NaN
+			
+			NaN，非数字。可使用 isNaN(num) 来判断。
+			Infinity，无穷大。可使用 isFinite(num) 来判断。
+			
         字符串
             a = "alex"
             a.charAt(索引位置)

@@ -9,10 +9,9 @@
 	
 2、页面布局
 	-主站布局
-	
-	
-	
-	
+	视频补充看
+
+JavaScript:
 	8、函数
 	function func(arg){
 		return arg + 1;
@@ -158,6 +157,255 @@
 			解释过程中: var s;
 						然后再执行到var s = '123';再赋值
 			所以上面函数如果执行func()会提示undefined.
+			
+	14、JavaScript面向对象
+		function Foo(n){
+			this.name = n;
+			this.sayname = function(){
+				console.log(this.name);
+			}
+		}
+		
+		var obj1 = new Foo('we');
+		var obj2 = new Foo('me');
+		obj1.name
+		obj1.sayname()
+		
+		上面的定义会产生一个问题,function被定义两次.
+		解决办法:Foo的原型:
+			function Foo(n){
+				this.name = n;
+			}
+			#Foo的原型
+			Foo.prototype = {
+				'sayname' : function(){
+					console.log(this.name)
+				}
+			}
+			
+		a.this代指对象(python中的self)
+		b.创建创建对象时,new 函数()
+		
+		函数保存在原型中和python中保存在类中一样的存储结构.
+		
+DOM
+	查找:
+		1、直接查找
+			document.getElementById             根据ID获取一个标签
+			document.getElementsByName          根据name属性获取标签集合
+			document.getElementsByClassName     根据class属性获取标签集合
+			document.getElementsByTagName       根据标签名获取标签集合
+		2、间接查找
+			parentNode          // 父节点
+			childNodes          // 所有子节点
+			firstChild          // 第一个子节点
+			lastChild           // 最后一个子节点
+			nextSibling         // 下一个兄弟节点
+			previousSibling     // 上一个兄弟节点
+			 
+			parentElement           // 父节点标签元素
+			children                // 所有子标签
+			firstElementChild       // 第一个子标签元素
+			lastElementChild        // 最后一个子标签元素
+			nextElementtSibling     // 下一个兄弟标签元素
+			previousElementSibling  // 上一个兄弟标签元素
+			
+		3、内容操作
+			innerText   文本 
+			innerHTML   HTML内容
+			value       
+				input    --> 获取当前标签的值
+				select   --> 获取选中的value值(selectedIndex)
+				textarea --> 获取当前标签的值
+				
+			搜索框的示例
+			
+		4、样式操作
+			className
+			classList
+				classList.add
+				classList.remove
+				
+			obj.style.color = 'red';  对某一个样式操作
+		
+		5、属性操作
+			对某个标签中的某个属性进行操作
+			obj.setAttribute('xxx','xxxx')  xxx = 'xxxx'  
+			obj.removeAttribute('value');         
+			obj.attributes     获取所有属性
+		
+		6、创建标签添加到html中
+			比如点击加号添加一行表格
+			
+			创建标签:
+				// 方式一    对象方式
+					var tag = document.createElement('a')
+					tag.innerText = "wupeiqi"
+					tag.className = "c1"
+					tag.href = "http://www.cnblogs.com/wupeiqi"
+					 
+				// 方式二    字符串方式
+					var tag = "<a class='c1' href='http://www.cnblogs.com/wupeiqi'>wupeiqi</a>"
+		
+				var p = document.createElement('p')  创建一个p标签
+				p.appendchild(div);                  p标签包裹div标签
+			
+			操作标签:
+				// 方式一
+					var str = "<input type='text' />";
+					xxx.insertAdjacentHTML("beforeEnd",str);    str字符串
+					xxx.insertAdjacentElement('afterBegin',document.createElement('p'))
+					 
+					//注意：第一个参数只能是'beforeBegin'、 'afterBegin'、 'beforeEnd'、 'afterEnd'  添加到不同的位置
+					 
+				// 方式二
+					var tag = document.createElement('a')
+					xxx.appendChild(tag)                        tag对象
+					xxx.insertBefore(tag,xxx[1])
+
+		7、提交表单
+			document.geElementById('form').submit()
+
+		8、其他
+			console.log                 输出框
+			alert                       弹出框
+			confirm                     确认框
+			  
+			// URL和刷新
+			location.href               获取当前URL
+			location.href = "url"       重定向,设置当前url
+			location.reload()           重新加载
+			  
+			// 定时器
+			setInterval                 多次定时器
+			clearInterval               清除多次定时器
+			setTimeout                  单次定时器
+			clearTimeout                清除单次定时器
+			
+			var v = confirm('真的要删除么?');
+			console.log(v);   v等于true或false
+		
+		行为 结构 样式 相分离的结构样式
+		<body>
+			<table border="1">
+				<tr><td>1</td><td>2</td><td>3</td></tr>
+				<tr><td>1</td><td>2</td><td>3</td></tr>
+				<tr><td>1</td><td>2</td><td>3</td></tr>
+			</table>
+			<script>
+				var myTrs = document.getElementsByTagName('tr');
+				for(var i = 0; i < myTrs.length; i++){
+					myTrs[i].onmouseover = function () {
+						this.style.backgroundColor = 'red';       谁调用这个函数this就指向谁,不能使用myTrs[i],是作用域的原因.
+					}
+					myTrs[i].onmouseout = function () {
+						this.style.backgroundColor = '';     
+					}
+				}
+			</script>		
+		<body>
+		
+		绑定事件的两种方式:
+			a.直接标签绑定 onclick='xx()';
+			b.先获取Dom对象,然后进行绑定
+				document.getElementById('xx').onclick
+				
+			this,当前触发事件的标签
+				a.第一种绑定方式
+					<input type='button' onclick='ClickOn(this)'>
+					function ClickOn(self){
+						self  当前点击的标签
+					}
+					
+				b.第二种绑定方式
+					<input type='button'>
+					document.getElementById('xx').onclick = function(){
+						this  代指当前点击的标签
+					}
+					
+				c.第三种绑定方式:
+					<div id="main">
+						<div id="content">123</div>
+					</div>
+					mymain.addEventListener("click",function(){console.log("main")},true)         true是捕捉(由外往内),false是冒泡(由内往外)
+					mycontent.addEventListener("click",function(){console.log("content")},true)
+					如果是true,捕捉,点击123,先打印main,然后打印content.
+		
+		9、事件
+			https://www.cnblogs.com/wupeiqi/articles/5643298.html
+			
+		例子:
+			function t1(age){
+				 console.log(age);  
+				 var age = 27;
+				 console.log(age);
+				 function age(){}
+				 console.log(age);
+			}
+			t1(3);
+			
+			词法分析:
+			action object ==> AO
+			1.形式参数  
+				AO.age = undefined
+				AO.age = 3;
+			2.局部变量
+				AO.age = undefined
+			3.方式声明表达式
+				AO.age = function()
+			
+			所以先输出: function age(){}
+						27
+						27
+
+			
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
