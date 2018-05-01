@@ -34,7 +34,6 @@ JavaScript
         - html文件中编写
         - 临时，浏览器的终端 console
         
-          
     基本数据类型
         数字
             a = 18;
