@@ -1,0 +1,401 @@
+jQuery
+	学习网站:http://jquery.cuishifeng.cn/
+	
+	首字母小写,后面大写.
+	()里面字符串   字符串拼接
+	
+	模块 《=》 类库
+	DOM/BOM/JavaScript的类库
+	
+	版本：
+		1.x  1.12.4(推荐使用)
+		2.x
+		3.x
+	
+	正常版本和压缩版本
+	
+	转换：
+		jquery对象[0]   => Dom对象
+		$(Dom对象)      => jquery对象
+		
+	先下载jQuery文件,然后倒入文件:
+	<script src="jquery-1.12.4.js"></script>  添加在body内部下方
+	$等效于jQuery关键字
+	
+	一、查找元素
+		DOM
+			10左右语法
+		jQuery：
+			选择器，直接找到某个或者某类标签
+			1. id
+				$('#id')
+			2. class
+				<div class='c1'></div>
+				$(".c1")
+			3. 标签
+				<div id='i10' class='c1'>
+					<a>f</a>
+					<a>f</a>
+				</div>
+				<div class='c1'>
+					<a>f</a>
+				</div>
+				<div class='c1'>
+					<div class='c2'> </div>
+				</div>
+				
+				$('a')
+				
+			4. 组合a
+				<div id='i10' class='c1'>
+					<a>f</a>
+					<a>f</a>
+				</div>
+				<div class='c1'>
+					<a>f</a>
+				</div>
+				<div class='c1'>
+					<div class='c2'> </div>
+				</div>
+				
+				$('a')
+				$('.c2')
+				
+				$('a,.c2') 所有a标签拿到,所有class=c2的标签也拿到.   逗号分开
+				
+			5. 层级
+				$('#i10 a') 子子孙孙                                 空格分开
+				$('#i10>a') 儿子(下一层)
+				
+			6. 基本
+				:first      第一个
+				:last       最后一个
+				:even       偶数
+				:odd        奇数
+				:eq(index)  索引
+				
+			7. 属性
+				$('[alex]')       具有alex属性的所有标签
+				$('[alex="123"]') alex属性等于123的标签
+				
+				<input type='text'/>
+				<input type='text'/>
+				<input type='file'/>
+				<input type='password'/>
+				
+				$("input[type='text']")
+				$(':text')       表单选择器
+				$(':checkbox')   表单选择器
+			
+			实例：	
+				多选，反选，全选
+				- 选择权
+				
+				- prop() 方法设置或返回被选元素的属性和值。
+					$('#tb:checkbox').prop('checked');        获取值
+					$('#tb:checkbox').prop('checked', true);  设置值
+					
+				- jQuery方法内置循环： $('#tb:checkbox').xxx
+					
+				- $('#tb:checkbox').each(function(k){
+						// k当前索引
+						// this-->DOM对象，当前循环的元素
+					})
+					
+					function reverseAll() {
+					$(':checkbox').each(function (k) {
+						if($(this).prop('checked')){
+							$(this).prop('checked',false);
+						}
+						else{
+							$(this).prop('checked',true);
+						}
+					})
+					
+				- var v = 条件 ? 真值 : 假值
+				
+				
+			筛选
+				<div>
+					<a>asdf</a>
+					<a>asdf</a>
+					<a id='i1'>asdf</a>
+					<a>asdf</a>
+					<a id='ii1'>asdf</a>
+					<a>asdf</a>
+				</div>
+				
+				$('#i1').next()
+				$('#i1').nextAll()          获取的数据可以通过下角标提取
+				$('#i1').nextUntil('#ii1')
+				
+				$('#i1').prev()
+				$('#i1').prevAll()
+				$('#i1').prevUntil('#ii1')  找到ii1为止
+					
+				$('#i1').parent()
+				$('#i1').parents()
+				$('#i1').parentsUntil()
+				
+				$('#i1').children()
+				$('#i1').siblings()
+				$('#i1').find()       子子孙孙中找
+				$('li:eq(1)')
+				$('li').eq(1)
+				first()
+				last()
+				hasClass(class)
+				
+				目录展开
+				$('.page').click(function () {
+					$(this).next().removeClass('hide').parent().siblings().find('.context').addClass('hide');
+				})
+
+		文本操作：
+				$(..).text()           # 获取文本内容,不解释html标签
+				$(..).text(“<a>1</a>”) # 设置文本内容
+				
+				$(..).html()           # 获取文本内容,解释标签
+				$(..).html("<a>1</a>")
+				
+				$(..).val()            #input、textarea等标签获取数据
+				$(..).val(..)          #input、textarea等标签设置数据
+				
+		样式操作：
+				hasClass
+				addClass
+				removeClass
+				toggleClass    有的话去掉,没有的话添加
+				
+		属性操作：
+				# 专门用于做自定义属性
+				$(..).attr('n')
+				$(..).attr('n','v')
+				$(..).removeAttr('n')
+				
+				<input type='checkbox' id='i1'  />
+						
+				# 专门用于chekbox,radio
+				$(..).prop('checked')
+				$(..).prop('checked', true)
+				
+				PS: 
+					index 获取索引位置(位于父类标签下孩子中的第几个)
+		
+		模态框\Tab栏
+					
+		文档处理：
+				append     往后加
+				prepend    往前加
+				after      外层的后面
+				before     外层的前面
+				
+				remove     删除内容和标签
+				empty      清空内容
+				
+				clone      克隆一份
+		css处理
+			
+			$('t1').css('样式名称', '样式值')
+			点赞：
+				- $('t1').append()
+				- $('t1').remove()
+				- setInterval
+				- 透明度 1 》 0
+				- position
+				- 字体大小，位置
+				 
+		位置：
+			$(window).scrollTop()  获取
+			$(window).scrollTop(0) 设置  回到顶部
+			scrollLeft([val])
+			
+			offset()
+			offset().left                 指定标签在html中的坐标
+			offset().top                  指定标签在html中的坐标
+			
+			position() 	                  指定标签相对父标签(relative)标签的坐标
+			<div style='relative'>
+				<div>
+					<div id='i1' style='position:absolute;height:80px;border:1px'></div>
+				</div>
+			</div>
+			
+			$('i1').height()           # 获取标签的高度 纯高度
+			$('i1').innerHeight()      # 获取边框 + 纯高度 + ？
+			$('i1').outerHeight()      # 获取边框 + 纯高度 + ？
+			$('i1').outerHeight(true)  # 获取边框 + 纯高度 + ？
+			
+			# 纯高度，边框，外边距，内边距
+			
+		事件
+			DOM： 三种绑定方式
+				jQuery：
+					$('.c1').click()
+					$('.c1').....
+					
+					$('.c1').bind('click',function(){
+						
+					})
+					
+					$('.c1').unbind('click',function(){
+						
+					})
+					
+					*******************
+					$('.c').delegate('a', 'click', function(){   对后面添加的标签添加事件,比如模态对话框删除添加
+					
+					})
+					$('.c').undelegate('a', 'click', function(){
+					
+					})
+					
+					$('.c1').on('click', function(){
+					
+					})
+					$('.c1').off('click', function(){
+					
+					})
+					
+				阻止事件发生   --->比如a标签添加click事件,点击执行完click后不想跳转,
+					return false   终止循环
+					
+					在表单提交很有用,无内容提示后不提交,有内容直接提交
+					
+				# 当页面框架加载完成之后，自动执行
+				$(function(){
+					
+					$(...)
+					
+				})
+				
+		jQuery扩展：
+			- $.extend        $.方法
+			- $.fn.extend     $(..).方法
+			
+			(function(){      自执行函数
+				var status = 1;
+				// 封装变量
+			})(jQuery)
+			
+				
+	二、JS 正则
+		test   - 判断字符串是否符合规定的正则
+			rep = /\d+/;
+			rep.test("asdfoiklfasdf89asdfasdf")
+			# true
+			
+			rep = /^\d+$/;
+			rep.test("asdfoiklfasdf89asdfasdf")
+			# false
+			
+		exec   - 获取匹配的数据
+			rep = /\d+/;
+			str = "wangshen_67_houyafa_20"
+			rep.exec(str)
+			# ["67"]     默认只拿第一个,数组形式
+			
+			JavaScript is more fun than Java or JavaBeans!
+			var pattern = /\bJava(\w*)\b/;
+			# ["JavaScript", "Script"]
+			
+			
+			JavaScript is more fun than Java or JavaBeans!
+			var pattern = /\bJava\w*\b/g;
+			# ["JavaScript"]
+			# ["Java"]
+			# ["JavaBeans"]
+			# null
+			
+			JavaScript is more fun than Java or JavaBeans!
+			var pattern = /\bJava(\w*)\b/g;
+			# ["JavaScript",'Script']
+			# ["Java", ""]
+			# ["JavaBeans", "Beans"]
+			# null
+			
+		多行匹配：
+			默认就是多行匹配
+			^$
+	    - 登录注册验证
+			默认事件先执行：
+				checkbox
+			自定义先执行
+				a
+				submit
+				...
+			<form>
+				
+				<input type='type' />
+				<input type='password' />
+				<input type='submit' />
+				
+			</form>
+	   
+			$(':submit').click(function(){
+				
+				$(':text,:password').each(function(){
+					...
+					return false;
+				})
+				return false;
+			})   
+	   
+			input,checbox
+	   
+		================================== 验证 ================================
+		JS： 验证
+			 
+			 各种验证
+			 
+				$(':submit').click(function(){
+					
+					$(':text,:password').each(function(){
+						...
+						return false;
+					})
+					return false;
+				})   
+		
+		后端：python实现
+		
+		业务处理
+		....
+		
+	三、组件   
+	    !important;  最重要的
+		bxslider  轮播图
+	
+		BootStrap
+			- css
+			- js
+		学习 BootStrap 规则
+		
+		一、响应式
+			@media
+			
+		二、图标、字体
+			@font-face
+			
+		三、基本使用
+			
+		========》 后台管理
+		
+		jQueryUI *
+			- css
+			- js
+		学习 jQueryUI 规则
+		
+		EasyUI
+			- css
+			- js
+			
+		学习 jQueryUI 规则
+		============ Ajax操作 ================
+
+	
+	
+	
+	
+	
+			
