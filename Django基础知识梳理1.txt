@@ -1,0 +1,595 @@
+1、pip和pip3的区别:
+	安装了python3之后，会有pip3
+	使用pip install XXX ：新安装的库会放在这个目录下面：python2.7/site-packages；
+	使用pip3 install XXX ：新安装的库会放在这个目录下面：python3.6/site-packages；
+
+3、WEB框架
+	MVC
+		Model       View       Controller
+		数据库   模板文件    业务处理	
+	MTV
+
+		Model    Template     View
+		数据库   模板文件    业务处理
+	Django基于MTV框架
+	
+4、Django
+	pip3 install django
+	
+	C:\Python35\Scripts 添加到系统环境变量,就可以在任何位置创建Django的工程
+	
+	# 创建Django工程
+	django-admin.py startproject project_name
+	
+	#目录树
+	mysite
+		- mysite        # 对整个程序进行配置
+			- init
+			- settings  # 配置文件
+			- url       # URL对应关系
+			- wsgi      # 遵循WSIG规范，uwsgi + nginx
+		- manage.py     # 管理Django程序：
+							- python manage.py 
+							- python manage.py startapp cmdb               //创建APP 名字叫cmdb
+							- python manage.py runserver 127.0.0.1:8001    //运行Django功能
+							- python manage.py makemigrations              //创建更改的文件
+							- python manage.py migrate                     //将生成的py文件应用到数据库
+							- python manage.py createsuperuser             //创建超级用户
+							- python manage.py changepassword username     //修改用户密码  
+							其他指令可以进入manage.py的目录下运行python manage.py查看
+		
+	#虚拟环境依赖安装
+		virtualenv可以搭建虚拟且独立的python环境，可以使每个项目环境与其他项目独立开来，保持环境的干净，解决包冲突问题。
+		virtualenvwrapper是virtualenv的扩展工具，可以方便的创建、删除、复制、切换不同的虚拟环境。
+		
+	#虚拟环境使用方法：
+		mkvirtualenv env1：       创建运行环境env1
+		workon env1:              启动或者切换到虚拟环境env1
+		deactivate:               退出终端环境
+		
+		lssitepackages:           列出当前环境安装了的包
+		cdvirtualenv env1:        cd到当前环境env1的目录
+		cdsitepackages:           进入当前环境的site-packages目录,该目录下是第三方包
+		cpvirtualenv env1 env2:   复制虚拟环境
+		rmvirtualenv env1：       删除运行环境env1
+
+	app：
+		migrations     数据修改表结构
+		admin          Django为我们提供的后台管理
+		apps           配置当前app
+		models         ORM,写指定的类  通过命令可以创建数据库结构
+		tests          单元测试
+		views          业务代码
+		
+	注意:把我们新定义的app加到settings.py中的INSTALL_APPS中
+
+5、setting.py的配置
+	1、配置模板的路径
+		TEMPLATES = [
+				{
+					'BACKEND': 'django.template.backends.django.DjangoTemplates',
+					'DIRS': [os.path.join(BASE_DIR, 'templates')],      #到templates下取模板
+					'APP_DIRS': True,
+					'OPTIONS': {
+						'context_processors': [
+							'django.template.context_processors.debug',
+							'django.template.context_processors.request',
+							'django.contrib.auth.context_processors.auth',
+							'django.contrib.messages.context_processors.messages',
+						],
+					},
+				},
+			]
+			
+	2、数据库配置
+		DATABASES = {
+				'default': {
+					# 'ENGINE': 'django.db.backends.sqlite3',
+					# 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+					'ENGINE': 'django.db.backends.mysql',        #mysql数据库
+					'NAME': 'Django_weak1',                      
+					'USER': 'root',
+					'PASSWORD': '123456',
+					'HOST': '47.97.122.241',
+					'PORT': '3306',
+				}
+			}
+	
+	3、配置静态目录
+	静态文件: 网站中的 js, css, 图片，视频等文件
+	STATIC_URL : 这个static是在Django具体APP下建立的static目录，用来存放静态资源。
+	STATICFILES_DIRS : 一般用来设置通用的静态资源，对应的目录不放在APP下，而是放在Project下.
+	
+	STATIC_URL = '/static/'
+	STATICFILES_DIRS = (
+		os.path.join(BASE_DIR, 'static'),     #记得加逗号
+	)
+	
+	使用:<link rel="stylesheet" href="/static/commons.css" />
+	
+	4、Django请求生命周期
+		-> URL对应关系（匹配） -> 视图函数 -> 返回用户字符串
+		-> URL对应关系（匹配） -> 视图函数 -> 打开一个HTML文件，读取内容
+		
+		-> 路由系统 -> 试图函数(获取模板+数据=》渲染) -> 字符串返回给用户
+	
+	5、view.py
+		HTTP应用的信息是通过请求报文、响应报文传递的。
+　　	请求报文由客户端发送，其中包含和许多的信息，而django将这些信息封装成了HttpRequest对象，该对象由HttpRequest类创建。
+		每一个请求都会生成一个HttpRequest对象，django会将这个对象自动传递给响应的视图函数，一般视图函数约定俗成地使用request参数承接这个对象。
+		- HttpRequest.scheme:一个字符串，代表请求的方案，一般为 'http' 或 'https'。
+		- HttpRequest.body:一个字符串，代表请求报文的主体。
+		- HttpRequest.path:
+		- HttpRequest.path_info:
+		- HttpRequest.method:一个字符串，表示请求使用的HTTP方法。必须使用大写。
+		- HttpRequest.encoding:一个字符串，表示提交的数据的编码方式（如果为 None则表示使用DEFAULT_CHARSET的设置，默认为 'utf-8'）。
+		- HttpRequest.GET:
+		- HttpRequest.POST:
+		- HttpRequest.COOKIES:
+		- HttpRequest.session:
+		- HttpRequest.FILES:一个类似于字典的对象，包含所有的上传文件信息。
+		- HttpRequest.META:一个标准的Python字典，包含所有的HTTP首部,具体的头部信息取决于客户端和服务器.
+		- 请求的其他信息
+		from django.core.handlers.wsgi import WSGIRequest
+		request.environ //封装所有用户请求信息
+		request.environ['HTTP_USER_AGENT']  //客户端的信息，我们可以根据这个返回不同的结果，比如手机版和PC版返回的显示排版不同。
+
+		
+		a、获取用户请求数据
+		request.POST.get('name',None)
+		request.GET.get('name',None)
+		reqeust.FILES.get('name')
+		PS:
+			GET:获取数据				
+			POST:提交数据
+			
+		b、request.POST.getlist()  字典的形式返回表单提交的数据
+		<QueryDict: {'hostname': ['HDU-rib'], 'ip': ['127.0.0.0'], 'post': ['80'], 'favor': ['read', 'write']}>
+		-->checkbox等多选的内容			
+			
+		c、上传文件
+			#上传文件,FILES只有在请求的方法为POST且提交的<form>带有enctype="multipart/form-data" 的情况下才会包含数据
+			<input type="file" name="fafafa"/>
+			obj = request.FILES.get("fafafa")
+			obj.name --> 上传文件的名字 
+			f = open(obj.name, mode='wb')
+			for item in obj.chunks():
+				f.write(item)
+			f.close()
+			
+			文件对象 = reqeust.FILES.get()
+			文件对象.name
+			文件对象.size
+			文件对象.chunks()
+			
+		d、给用户返回数据：
+			render(request, "模板的文件的路径", {'k1': [1,2,3,4],"k2": {'name': '张扬','age': 73}})
+			redirect("URL")
+			HttpResponse(字符串)
+	
+	4、FBV & CBV
+		FBV function base view /url/ --> 函数
+		CBV class base view /url/ -->类
+		
+		FBV：函数
+			def index(request,*args,**kwargs):
+		
+		CBV：类
+			#urls.py
+			url(r'/home',views.CBVtest.as_view()),
+			#views.py
+			from django import views		
+			class CBVtest(views.View):
+				def dispatch(self, request, *args, **kwargs):
+					print("类似装饰器：before")
+					result = super(CBVtest, self).dispatch(request, *args, **kwargs)
+					print("类似装饰器：after")
+					return result
+
+				def get(self, request):  # 定义get方法，get请求执行这个方法
+					print(request.method)
+					return HttpResponse('cbvget')
+
+				def post(self, request):  # 定义post方法，post请求执行这个方法
+					print(request.method)
+					return HttpResponse('cbvpost')
+			
+	5、路由系统
+		- regex不会去匹配GET或POST参数或域名，
+			对于https://www.example.com/myapp/，regex只尝试匹配myapp/
+		    对于https://www.example.com/myapp/?page=3,regex也只尝试匹配myapp/
+		
+		1、url(r'^index/', views.index),              //函数  
+		   url(r'^home/', views.Home.as_view()),      //类
+		2、url(r'^detail-(\d+).html', views.detail),  
+		3、url(r'^detail-(?P<nid>\d+)-(?P<uid>\d+).html', views.detail)
+
+	   实战：
+			a. url(r'^detail-(\d+)-(\d+).html', views.detail),
+				def func(request, nid, uid):				
+					pass
+			
+				def func(request, *args):
+					args = (2,9)
+					
+				def func(request, *args, **kwargs):
+					args = (2,9)
+	   
+			b. url(r'^detail-(?P<nid>\d+)-(?P<uid>\d+).html', views.detail) 
+				//(?P<v1>\d+) --> 正则表达式的分组，相当于一个字典， key=v1, value=\d+。 {"v1":"\d+"}
+				def func(request, nid, uid):
+					pass
+					
+				def funct(request, **kwargs):
+					kwargs = {'nid': 1, 'uid': 3}
+					
+				def func(request, *args, **kwargs):
+					args = (2,9)
+					
+		4、 name
+			对URL路由关系进行命名， ***** 以后可以根据此名称生成自己想要的URL *****
+			url(r'^asdfasdfasdf/', views.index, name='i1'),
+			url(r'^yug/(\d+)/(\d+)/', views.index, name='i2'),
+			url(r'^buy/(?P<pid>\d+)/(?P<nid>\d+)/', views.index, name='i3'),
+			
+			#views.py中通过reverse逆向解析url
+			from django.urls import reverse    
+			url1 = reverse('i1')                              # asdfasdfasdf/
+			url2 = reverse('i2', args=(1,2))                  # yug/1/2/
+			url3 = reverse('i3', kwargs={'pid': 1, "nid": 9}) # buy/1/9/
+			
+			#html中逆向解析url
+			{% url "i1" %}               # asdfasdfasdf/
+			{% url "i2" 1 2 %}           # yug/1/2/
+			{% url "i3" pid=1 nid=9 %}   # buy/1/9/
+			
+			注：
+				# 当前的URL
+				request.path_info 
+				
+		5、多级路由
+			project/urls.py
+				from django.conf.urls import url,include
+				from django.contrib import admin
+
+				urlpatterns = [
+					url(r'^cmdb/', include("app01.urls")),
+					url(r'^monitor/', include("app02.urls")),
+				]
+				
+			app01/urls.py
+				from django.conf.urls import url,include
+				from django.contrib import admin
+				from app01 import views
+
+				urlpatterns = [
+					url(r'^login/', views.login),
+				]
+				
+			app02/urls.py
+				from django.conf.urls import url,include
+				from django.contrib import admin
+				from app02 import views
+
+				urlpatterns = [
+					url(r'^login/', views.login),
+				]
+		
+		6、默认值
+			url(r'^index/', views.index, {'name': 'root'}),
+			def index(request,name):
+				print(name)
+				return HttpResponse('OK')
+	
+		7、命名空间
+			/admin/    include('app01.urls',namespace='m1')
+			/crm/      include('app01.urls',namespace='m1')
+			
+			app01.urls
+			/index/    name = 'n1'
+
+			reverser('m1:n1')
+		
+	6、模板渲染
+		-- {{ 变量名 }}
+			def func(request):
+				return render(request, "index.html", {'current_user': "alex"})
+			在html中:{{ current_user }}  
+				
+			示例:index.html
+				<body>
+					<div>{{current_user}}</div> 
+				</body>
+				====> 最后生成的字符串
+				<body>
+					<div>alex</div>
+				</body>
+				
+		-- For循环 {% endfor %}
+			def func(request):
+				return render(request, "index.html", {'current_user': "alex", 'user_list': ['alex','eric']})
+	
+				
+			示例:index.html
+				<body>
+					<div>{{current_user}}</div>
+					<ul>
+						{% for row in user_list %}
+							{% if row == "alex" %}
+								<li>{{ row }}</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</body>
+			
+		-- 字典索引 
+			def func(request):
+				return render(request, "index.html", {
+							'current_user': "alex", 
+							'user_list': ['alex','eric'], 
+							'user_dict': {'k1': 'v1', 'k2': 'v2'}})
+	
+			示例:index.html
+				<body>
+					<a> {{ user_list.1 }}  </a>     //注意使用. 
+					<a> {{ user_dict.k1 }} </a>
+					<a> {{ user_dict.k2 }} </a>	
+				</body>
+
+		-- 条件   {% endif %}
+			def func(request):
+				return render(request, "index.html", {
+							'current_user': "alex", 
+							"age": 18,
+							'user_list': ['alex','eric'], 
+							'user_dict': {'k1': 'v1', 'k2': 'v2'}})
+
+			示例:index.html
+				<body>
+					{% if age %}
+						<a>有年龄</a>
+						{% if age > 16 %}
+							<a>老男人</a>
+						{% else %}
+							<a>小鲜肉</a>
+						{% endif %}
+					{% else %}
+						<a>无年龄</a>
+					{% endif %}
+				</body>
+
+		总结:	
+			render(request, "模板的文件的路径", {'obj': 1234, 'k1': [1,2,3,4],"k2": {'name': '张扬','age': 73}})
+	
+			<body>
+				***********索引用点***********
+				<h1> {{ obj }} </h1>
+				<h1> {{ k1.3 }} </h1>
+				<h1> {{ k2.name }} </h1>
+				{% for i in k1 %}
+					<p> {{ i }} </p>
+				{% endfor %}
+				
+				{% for row in k2.keys %}    //key循环
+					{{ row }}
+				{% endfor %}
+				
+				{% for row in k2.values %}  //value循环
+					{{ row }}
+				{% endfor %}
+				
+				{'id':1,'caption':'运维1'} --> k2
+				{% for k,v in k2.items %}   //key|value循环
+					{{ k }} - {{v}}
+				{% endfor %}
+				
+				[{'id':1,'caption':'运维1'},{'id':2,'caption':'运维2'},{'id':3,'caption':'运维3'}] --> v2
+				{% for row in v2 %}    //key循环
+					{{ row.id }} - {{ row.caption }}
+				{% endfor %}
+				
+			</body>
+	7、Templates
+		- html模板的继承
+			- extends 只能继承一个模板
+				模板html:
+				<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<title>{% block title %} {# 特有的标题 #} {% endblock %}</title>
+					<style>
+						{#公共的css#}
+					</style>
+					{% block css %} {# 特有的css #} {% endblock %}
+				</head>
+				<body>
+					{% block content %} {# 特有的内容 #} {% endblock %}
+					<script src="jquery-1.12.4.js"></script>
+					{% block js %} {# 特有的js #} {% endblock %} 
+				</body>
+				</html>
+				
+				需要渲染的html: 
+				{% extends 'master.html' %}
+				{% block title %} {# 特有的标题 #} {% endblock %}
+				{% block content %}
+					<div>
+						{# 特有的内容 #}
+					</div>
+				{% endblock %}
+				{% block css %}
+					<style>
+						{# 特有的css #}
+					</style>
+				{% endblock %}
+				{% block js %}
+					<script>
+						{# 特有的js #} 
+					</script>
+				{% endblock %}
+				
+			- include 把tag.html中所有内容拿过来放在该位置.所以tag.html中是重复的内容.
+				{% include 'tag.html' %}
+				
+		- 自定义函数
+			simple_tag
+				a. 在某个app下创建templatetags目录
+				b. 在templatetags目录下创建一个xx.py文件
+				c. from django import template
+				   from django.utils.safestring import mark_safe
+				   register = template.Library()  -->创建template对象register
+				d. 
+					@register.simple_tag
+					def func(a1,a2)
+						return a1 + a2
+				e. settings中注册APP
+				f. 顶部 {% load xx %}
+				g. {% 函数名 arg1 arg2 %} --> {% func 1 2 %} --> 显示3
+				缺点：
+					不能作为if条件
+				优点：
+					参数任意
+			filter
+				a. 在某个app下创建templatetags目录
+				b. 在templatetags目录下创建一个xx.py文件
+				c. from django import template
+				   from django.utils.safestring import mark_safe
+				   register = template.Library()  -->创建template对象register
+				d. 
+					@register.filter
+					def func(a1,a2)
+						return a1 + a2
+				e. settings中注册APP
+				f. 顶部 {% load xxoo %}
+				g. {{ 参数一|函数名:"参数二，参数三" }} {{ 参数一|函数名:数字 }}
+				缺点：
+					最多两个参数，不能加空格
+				优点：
+					能作为if条件
+					
+		8、ORM操作
+			select * from tb where id > 1
+			# 对应关系
+			models.tb.objects.filter(id__gt=1)   id>1
+			models.tb.objects.filter(id__gte=1)  id>=1
+			models.tb.objects.filter(id=1)       id=1
+			models.tb.objects.filter(id__lt=1)   id<1
+			
+			a. 先写类
+				from django.db import models
+
+				# app01_userinfo
+				class UserInfo(models.Model):   --> 一共有3列
+					# id列，自增，主键
+					# 用户名列，字符串类型，指定长度
+					username = models.CharField(max_length=32)
+					password = models.CharField(max_length=64)
+				
+			b. 把app加到settings.py中的INSTALL_APPS中
+				INSTALLED_APPS = [
+					'django.contrib.admin',
+					'django.contrib.auth',
+					'django.contrib.contenttypes',
+					'django.contrib.sessions',
+					'django.contrib.messages',
+					'django.contrib.staticfiles',
+					'app01',
+				]
+				
+			c. 执行命令
+				python manage.py  makemigrations
+				python manage.py  migrate
+				
+			d. 在Python2.7时代连接MySql的MySQLdb还不支持Python3.4,但是Django默认使用MySQLdb模块链接MySQL
+			    所以需要主动修改为pymysql，在project同名文件夹下的__init__文件中添加如下代码即可：
+				import pymysql
+				pymysql.install_as_MySQLdb()
+				
+			e. 字段类型：
+				1、AutoField：一个自增的IntegerField，一般不直接使用，Django会自动给每张表添加一个自增的primary key(主键)。
+				2、BigIntegerField：64位整数。
+				3、BinaryField：存储二进制数据。
+				4、BooleanField：True/False。
+				5、CharField：存储字符串。必须有 max_length 参数指定长度。如果字符串巨长，推荐使用 TextField。
+				6、DateField：日期。
+					DateField.auto_now: 每次执行save操作的时候自动记录当前时间，常作为最近一次修改的时间使用。
+					DateField.auto_now_add: 第一次创建的时候添加当前时间。常作为创建时间使用。注意：每次create都会调用。
+				7、DateTimeField：日期+时间。与python里的 datetime.datetime 实例同。常用附加选项和DateField一样。
+				8、EmailField：在CharField基础上附加了邮件地址合法性验证。
+				9、FileField：文件上传。
+				10、ImageField：在FileField基础上加上是否是合法图片验证功能的一个类型。
+				11、IntegerField：整数。
+				12、GenericIPAddressField：IP地址，字符串类型，如 127.0.0.1。
+				13、TextField：大文本，巨长的文本。
+				14、URLField：加了URL合法性验证的CharField。
+				15、ForeignKey / ManyToManyField / OneToOneField
+				16、AutoField：自增（primary_key=True）
+				
+			f. 字段的参数：
+				null               -> db是否可以为空
+				default            -> 默认值
+				primary_key        -> 主键
+				db_column          -> 列名
+				db_index           -> 索引
+				unique			   -> 唯一索引
+				unique_for_date     
+				unique_for_month
+				unique_for_year
+				auto_now           -> 创建时，自动生成时间
+				auto_now_add       -> 更新时，自动更新为当前时间
+				
+				choices			  -> django admin中显示下拉框，避免连表查询
+				blank             -> django admin是否可以为空
+				verbose_name      -> django admin显示字段中文
+				editable          -> django admin是否可以被编辑
+				error_messages    -> 错误信息欠
+				help_text         -> django admin提示
+				validators		  -> django form ,自定义错误信息（欠）
+			
+			g.操作
+				b. 操作
+					- 增
+						models.User.objects.create(name='qianxiaohu',age=18)
+						dic = {'name': 'xx', 'age': 19}
+						models.User.objects.create(**dic)
+
+						obj = models.User(name='qianxiaohu',age=18)
+						obj.save()
+					删
+						models.User.objects.filter(id=1).delete()
+					改
+						models.User.objects.filter(id__gt=1).update(name='alex',age=84)
+						dic = {'name': 'xx', 'age': 19}
+						models.User.objects.filter(id__gt=1).update(**dic)
+					查
+						models.User.objects.filter(id=1,name='root')
+						models.User.objects.filter(id__gt=1,name='root')
+						models.User.objects.filter(id__lt=1)
+						models.User.objects.filter(id__gte=1)
+						models.User.objects.filter(id__lte=1)
+						
+						models.User.objects.filter(id=1,name='root')
+						dic = {'name': 'xx', 'age__gt': 19}
+						models.User.objects.filter(**dic)
+						
+						# QuerySet ,内部元素都是对象
+						v1 = models.Business.objects.all()
+						[obj(id,caption,code),obj(id,caption,code),obj(id,caption,code)]
+						
+						# QuerySet ,内部元素都是字典
+						v2 = models.Business.objects.all().values('id','caption')
+						[{'id':1,'caption':'运维1'},{'id':2,'caption':'运维2'},{'id':3,'caption':'运维3'}]
+						
+						# QuerySet ,内部元素都是元组
+						v3 = models.Business.objects.all().values_list('id','caption')
+						[(1,运维1),(2,运维2)}
+					
+						models.Business.objects.get(id=1) -->获取到的一个对象，如果不存在就报错
+						models.Business.objects.filter(id=1).first() -->获取到对象或者None
+			
+			
+
+			
+	
+
