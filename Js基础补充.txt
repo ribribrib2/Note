@@ -1,0 +1,112 @@
+1.document.write() 仅仅向文档输出写内容,如果在文档已完成加载后执行document.write，整个HTML页面将被覆盖。
+
+2.console.log()的用处:
+	主要是方便你调式javascript用的, 你可以看到你在页面中输出的内容。
+	相比alert他的优点是：他能看到结构化的东西，如果是alert，弹出一个对象就是[object object],但是console能看到对象的内容。console不会打断你页面的操作，如果用alert弹出来内容，那么页面就死了，但是console输出内容后你页面还可以正常操作。
+	
+3.JavaScript 中，常见的是驼峰法的命名规则.
+
+4.typeof 'asdf' --> 查看数据类型.
+	字符串（String）、数字(Number)、布尔(Boolean)、数组(Array)、对象(Object)、空（Null）、一个没有设置值的变量（Undefined）
+	- typeof "John"                // 返回 string 
+	- typeof 3.14                  // 返回 number
+	- typeof false                 // 返回 boolean
+	- typeof [1,2,3,4]             // 返回 object
+	- typeof {name:'John', age:34} // 返回 object
+	
+	ps:null 和 undefined 的值相等，但类型不等
+	
+	- 在 JavaScript 中有 5 种不同的数据类型：
+		string
+		number
+		boolean
+		object
+		function
+	- 3种对象类型：
+		Object
+		Date
+		Array
+	- 2个不包含任何值的数据类型：
+		null
+		undefined
+		
+	使用typeof来获取一个变量是否存在，如 if(typeof a!="undefined"){}
+	
+5.JavaScript 变量的生存期
+	JavaScript 变量的生命期从它们被声明的时间开始。
+	- 局部变量会在函数运行以后被删除。
+	- 全局变量会在页面关闭后被删除。
+	
+6.switch语句.
+	 case 10:
+     case 11:alert("10或者11");  break;   //10或者11，都会走 alert("10或者11") 
+	 
+7.正则表达式:http://www.runoob.com/js/js-regexp.html 
+	 
+8.JavaScript 错误
+	- try 语句测试代码块的错误。
+	- catch 语句处理错误。
+	- throw 语句创建自定义错误。
+	
+	try { 
+		if(x == "")  throw "值为空";
+		if(isNaN(x)) throw "不是数字";
+		x = Number(x);
+		if(x < 5)    throw "太小";
+		if(x > 10)   throw "太大";
+	}
+	catch(err) {
+		message.innerHTML = "错误: " + err;
+	}
+	
+9.使用"use strict"指令 : 严格模式下你不能使用未声明的变量。
+
+10.
+	- 加法与连接注意事项
+		var x = 10 + "5";        // x 的结果为 "105"
+	
+	- 浮点型数据使用注意事项
+		var x = 0.1;
+		var y = 0.2;
+		var z = x + y            // z 的结果为 0.3
+		if (z == 0.3)            // 返回 false
+
+11.html5 属性: <input required="required">  点击提交按钮，如果输入框是空的，浏览器会提示错误信息
+
+12.表单提交验证
+	验证表单数据是否为空？
+	验证输入是否是一个正确的email地址？
+	验证日期是否输入正确？
+	验证表单输入内容是否为数字型？
+	
+	http://www.runoob.com/js/js-validation.html
+	http://www.runoob.com/js/js-form-validation.html
+	http://www.runoob.com/js/js-validation-api.html 
+	
+13.JavaScript JSON序列化
+
+14.void:计算一个表达式但是不返回值
+	定义一个死链接请使用 javascript:void(0);
+	<a href="javascript:void(0);">点我没有反应的!</a>
+	
+	void()仅仅是代表不返回任何值，但是括号内的表达式还是要运行，如void(alert("Wornning!"))
+	 
+15.由于函数声明不是一个可执行语句，所以不以分号结束。
+
+16.匿名函数:
+	var x = function (a, b) {return a * b};   //以分号结尾，因为它是一个执行语句
+    var z = x(4, 3);                          //在函数表达式存储在变量后，变量也可作为一个函数使用
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 

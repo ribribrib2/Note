@@ -476,10 +476,11 @@
 			models.tb.objects.filter(id=1)       id=1
 			models.tb.objects.filter(id__lt=1)   id<1
 			
+			新建app01
 			a. 先写类
 				from django.db import models
 
-				# app01_userinfo
+				# app01_userinfo -->表名称
 				class UserInfo(models.Model):   --> 一共有3列
 					# id列，自增，主键
 					# 用户名列，字符串类型，指定长度
@@ -506,8 +507,10 @@
 				import pymysql
 				pymysql.install_as_MySQLdb()
 				
+				SQLAlchemy --> 连接数据库(MySQL,SQLite,PostgreSQL),创建数据表
+				
 			e. 字段类型：
-				1、AutoField：一个自增的IntegerField，一般不直接使用，Django会自动给每张表添加一个自增的primary key(主键)。
+				1、AutoField：一个自增的IntegerField，一般不直接使用，Django会自动给每张表添加一个自增的primary key(主键 primary_key=True)。
 				2、BigIntegerField：64位整数。
 				3、BinaryField：存储二进制数据。
 				4、BooleanField：True/False。
@@ -524,7 +527,6 @@
 				13、TextField：大文本，巨长的文本。
 				14、URLField：加了URL合法性验证的CharField。
 				15、ForeignKey / ManyToManyField / OneToOneField
-				16、AutoField：自增（primary_key=True）
 				
 			f. 字段的参数：
 				null               -> db是否可以为空
@@ -588,8 +590,109 @@
 						models.Business.objects.get(id=1) -->获取到的一个对象，如果不存在就报错
 						models.Business.objects.filter(id=1).first() -->获取到对象或者None
 			
+			一对一：子表从母表中选出一条数据一一对应，母表中选出来一条就少一条，子表不可以再选择母表中已被选择的那条数据
+			一对多：子表从母表中选出一条数据一一对应，但母表的这条数据还可以被其他子表数据选择(员工与部门)
+			多对多: 每个孩子可以喜欢多种颜色，一种颜色可以被多个孩子喜欢，对于双向均是可以有多个选择
 			
+			h. 一对多:
+					class UserType(models.Model):
+						name = models.CharField(max_length=32)
+					
+					class User(models.Model):
+						username = models.CharField(max_length=32)
+						email = models.EmailField()
+						user_type = models.ForeignKey("UserType")
+					
+					username    email                user_type_id     
+					张三        1111111111@qq.com    1
+					李四        2222222222@qq.com    2
+					
+					user_list = User.objects.all()
+					for obj in user_list:
+						obj.username
+						obj.email
+						obj.user_type.id    -->代表一个数据
+						obj.user_type.name  -->代表一个数据
 
+					--> ***********确认***********
+						在联表操作过滤查找数据时用双下划线 "__"
+						在取数据时用点 "."
+
+					models.User.objects.create("username": "chenchao", "email": "1045602705@qq.com", "user_type_id": 1)
+
+			
+			i. 多对多:
+				方式一：自定义关系表
+					class Host(models.Model):
+						nid = models.AutoField(primary_key=True)                          -->自己创建自增列
+						hostname = models.CharField(max_length=32,db_index=True)          -->索引
+						ip = models.GenericIPAddressField(protocol="ipv4",db_index=True)  -->索引,IP字段
+						port = models.IntegerField()
+						b = models.ForeignKey(to="Business", to_field='id')
+					
+					class Application(models.Model):
+						name = models.CharField(max_length=32)
+
+					class HostToApp(models.Model):
+						hobj = models.ForeignKey(to='Host',to_field='nid')
+						aobj = models.ForeignKey(to='Application',to_field='id')
+						
+					--> HostToApp.objects.create(hobj_id=1,aobj_id=2)
+					
+				方式二：自动创建关系表
+					class Host(models.Model):
+						nid = models.AutoField(primary_key=True)
+						hostname = models.CharField(max_length=32,db_index=True)
+						ip = models.GenericIPAddressField(protocol="ipv4",db_index=True)
+						port = models.IntegerField()
+						b = models.ForeignKey(to="Business", to_field='id')
+					
+					class Application(models.Model):
+						name = models.CharField(max_length=32)
+						r = models.ManyToManyField("Host")
+						
+					无法直接对第三张表进行操作
+						obj = Application.objects.get(id=1)
+						obj.name
+						
+						# 第三张表操作
+						obj.r.add(1)
+						obj.r.add(2)
+						obj.r.add(2,3,4)
+						obj.r.add(*[1,2,3,4])
+						
+						obj.r.remove(1)
+						obj.r.remove(2,4)
+						obj.r.remove(*[1,2,3])
+						
+						obj.r.clear()
+						
+						obj.r.set([3,5,7])
+						
+						# 所有相关的主机对象“列表” QuerySet
+						obj.r.all()
+						
+			
+		
+		9、Ajax操作:
+			$.ajax({
+				url: '/index/',
+				data: {'k': 'v', 'list': [1,2,3,4], 'k3': JSON.stringfy({'k1': 'v'}))}, $(form对象).serilize() 
+				type: 'POST',
+				dataType: 'JSON':
+				traditional: true,
+				success：function(data){
+					// data是服务器端返回的字符串
+					var obj = JSON.parse(data);
+					location.reload()              # 刷新
+					location.href = "某个地址"     # 跳转
+				}
+			})
+			
+			建议：永远让服务器端返回一个字典
+			return HttpResponse(json.dumps(字典))
+
+			
 			
 	
 

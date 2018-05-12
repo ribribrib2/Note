@@ -282,7 +282,7 @@ CSS
 			
 			text-indent: 1em;                             #缩进                字体大小是16px，那么1em=16px(浏览器默认)
 			text-align: center                            #水平方向居中
-			line-height                                   #垂直方向根据标签高度
+			line-height                                   #垂直方向根据标签高度  垂直居中
 			
 			font-family: Georgia                          #字体
 			font-style: normal;                           #字体风格            italic - 文本斜体显示   oblique - 文本倾斜显示
@@ -338,7 +338,7 @@ CSS
 						}
 						body{
 							margin:0;
-							padding:0
+							padding:0;
 						}
 			三层层叠:
 					 -->第二第三层使用position: fixed

@@ -48,7 +48,7 @@ JavaScript
             a.charAt(索引位置)
             a.substring(起始位置，结束位置)
             a.length(获取当前字符串长度)
-			a.slice(起始位置，结束位置) 
+			a.slice(起始位置，结束位置)    部分截取
             ...
         列表(数组)
             a = [11,22,33]
@@ -181,8 +181,21 @@ Dom
 		</script>
 		
 	4、菜单点击展开
+		onclick事件:通过id找到该标签。1、下一个兄弟标签移除hide属性。2、再找到它的父亲标签的父亲标签的所有子标签,在每个子标签中第一个标签的css样式中添加hide。
 	
-	5、其他：
+	5、全选反选
+		onclick事件:通过TagName找到所有CheckBox标签,并设置checkbox对象.checked = true   --> 全选 
+					通过TagName找到所有CheckBox标签,并设置checkbox对象.checked = false  --> 取消 
+					通过TagName找到所有CheckBox标签,并读取checkbox对象.checked,并取反   --> 反选 
+	
+	6、模态框
+		onclick事件: 第二层\第三层的css样式中hide去掉. document.getElementById('i2').classList.remove('hide');
+		点击确认取消:第二层\第三层的css样式中添加hide. document.getElementById('i2').classList.add('hide');
+	
+	7、返回顶部
+		onclick事件:document.documentElement.scrollTop=0;
+	
+	6、其他：
 		alert()
 		console.log()
 		setInterval('fun()',500);   //定时器,500ms执行一次fun()

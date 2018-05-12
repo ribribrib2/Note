@@ -1,0 +1,357 @@
+Form： http://www.cnblogs.com/wupeiqi/articles/6144178.html
+Model：http://www.cnblogs.com/wupeiqi/articles/6216618.html
+
+
+1、ORM：Object Relational Mapping(关系对象映射)
+	类名对应    --------->数据库中的表名
+	类属性对应  --------->数据库里的字段
+	类实例对应  --------->数据库表里的一行数据
+	
+	python manage.py makemigrations  #根据app下的migrations目录中的记录，检测当前model层代码是否发生变化
+    python manage.py migrate         #把orm代码转换成sql语句去数据库执行
+	
+2、装饰器 -->cookie的用户登录验证
+	FBV:
+		def auth(func):
+			def inner(reqeust,*args,**kwargs):
+				v = reqeust.COOKIES.get('username')
+				if not v:
+					return redirect('/login/')
+				return func(reqeust, *args,**kwargs)
+			return inner
+
+	CBV: -->21周最后一节课
+		from django import views
+		from django.utils.decorators import method_decorator
+
+		@method_decorator(auth,name='dispatch')
+		class Order(views.View):
+
+			# @method_decorator(auth)
+			# def dispatch(self, request, *args, **kwargs):
+			#     return super(Order,self).dispatch(request, *args, **kwargs)
+
+			# @method_decorator(auth)
+			def get(self,reqeust):
+				v = reqeust.COOKIES.get('username111')
+				return render(reqeust,'index.html',{'current_user': v})
+
+			def post(self,reqeust):
+				v = reqeust.COOKIES.get('username111')
+				return render(reqeust,'index.html',{'current_user': v})
+	
+3、分页（自定义的分页）
+		
+4、 中间件
+	- XSS攻击：
+		{{ page_str|safe }}
+		mark_safe(page_str)
+
+	- CSRF
+		django为用户实现防止跨站请求伪造的功能，通过中间件 django.middleware.csrf.CsrfViewMiddleware 来完成。而对于django中设置防跨站请求伪造功能有分为全局和局部。
+		全局：
+		　　中间件 django.middleware.csrf.CsrfViewMiddleware
+		局部：
+			@csrf_protect，为当前函数强制设置防跨站请求伪造功能，即便settings中没有设置全局中间件。
+			@csrf_exempt，取消当前函数防跨站请求伪造功能，即便settings中设置了全局中间件。
+			注：from django.views.decorators.csrf import csrf_exempt,csrf_protect
+			
+		a. CSRF原理
+			- 在用户访问django的可信站点时，django反馈给用户的表单中有一个隐含字段csrf_token，这个值是在服务器端随机生成的，每一次提交表单都会生成不同的值。当用户提交django的表单时，服务器校验这个表单的csrf_token是否和自己保存的一致，
+			  来判断用户的合法性。当用户被csrf攻击从其他站点发送精心编制的攻击请求时，由于其他站点不可能知道隐藏的csrf_token字段的信息这样在服务器端就会校验失败，攻击被成功防御，这样就能避免被 CSRF 攻击。
+			  
+			第一步：后端随机产生一个token，把这个token保存在SESSION状态中；同时，后端把这个token交给前端页面；
+			第二步：下次前端需要发起请求（比如发帖）的时候把这个token加入到请求数据或者头信息中，一起传给后端；
+			第三步：后端校验前端请求带过来的token和SESSION里的token是否一致；
+			
+			比如第一次发送get请求,服务器给浏览器发送html的时候会携带一个csrf_token,然后点击提交的时候会浏览器会把这个csrf_token提交过去,如果返回的html有表单,服务器又会携带一个新的csrf_token过来.
+
+		b. 无CSRF时存在隐患
+			银行系统,已登录状态,提交表单数据
+
+		c. Form提交（CSRF）
+			veiw中设置返回值：
+				 return render(request, 'xxx.html', data)
+
+			html中设置Token:
+			　　{% csrf_token %}
+
+		d. Ajax提交（CSRF）
+			从cookie中拿到csrftoken,放到请求头中发回去
+			csrf在前端的key为：X-CSRFToken，到后端的时候django会自动添加HTTP_,并且最后为HTTP_X_CSRFToken
+			<script>
+				$(function () {
+					 $('#btn').click(function () {
+						 $.ajax({
+							 url:'/login/',
+							 type:'POST',
+							 data:{'user':'root','pwd':'123456'},
+							 header:{'X-CSRFToken':$.cookie('csrftoken')},
+							 success:function (args) {
+							}
+						})
+					})
+				})
+			</script>
+			
+			也可以通过ajaxSetup对全部的ajax请求进行配置:
+			function csrfSafeMethod(method) {
+				// these HTTP methods do not require CSRF protection
+				return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));   -->GET|HEAD|OPTIONS|TRACE等不需要CSRF
+			}
+			$.ajaxSetup({
+				beforeSend: function(xhr, settings) {
+					if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+						xhr.setRequestHeader("X-CSRFToken",$.cookie('csrftoken'));
+					}
+				}
+			});   -->ajax是通过调用XMLHttpRequest进行发送
+			
+			-->csrf在form中提交的时需要在前端form中添加{%csrftoken%}
+			1.在input中找到name=csrfmiddlewaretoken,然后获取值放在ajax的data中发回去
+			2.在cookie中找到key=csrftoken,然后获取值放在ajax的header中发回去
+			
+			疑问:
+				1.如果获取csrftoken拷贝过去呢?
+				2.input中找到name=csrfmiddlewaretoken和cookie中找到key=csrftoken是不一样的?
+
+5、缓存
+	5种配置
+	3种应用：
+		全局
+		视图函数
+		模板
+	
+6、cookie
+	客户端浏览器上的一个文件：键值对 {"user": 'dachengzi'}
+	在chrome浏览器的network-cookies能够查看到cookie的键值对。
+	利用cookie的特性来进行登录认证
+	流程：用户登录成功后服务器会往客户端浏览器写入一个键值对,在访问一些需要登录的页面时先到request中获取cookie,如果有代表登录过,注销就删除cookie.
+	cookie获取：
+		request.COOKIES['username']
+		request.COOKIES.get('username')
+		request.get_signed_cookie(key,salt='加密盐', max_age=None)
+			参数：
+				salt: 加密盐
+				max_age: 后台控制过期时间
+		
+	cookie设置:
+		rep = HttpResponse(...) 或 rep ＝ render(request, ...)
+		rep.set_cookie(key,value,...)
+		rep.set_signed_cookie(key,value,salt='加密盐',...)
+		return rep
+		参数：
+			key,              键
+			value='',         值
+			max_age=None,     超时时间
+			expires=None,     超时时间(某个时间节点失效,比如获取当前时间然后延后30天赋给expires,cookie会在30天后失效)
+			path='/',         Cookie生效的路径，/表示根路径，跟路径的cookie可以被任何url的页面访问(设置cookie使用的路径)
+			domain=None,      Cookie生效的域名
+			secure=False,     https传输这个要置为true
+			httponly=False    只能http协议传输，无法被JavaScript获取（但是底层抓包可以获取到也可以被覆盖）
+
+		由于cookie保存在客户端的电脑上，所以，JavaScript和jquery也可以操作cookie。
+		document.cookie -->js获取cookie(httponly=False)
+		<script src='/static/js/jquery.cookie.js'></script>	
+		$.cookie('key','value') --> 设置cookie
+		$.cookie('key')         --> 获取cookie值
+		
+	cookie也可以用于分页的每一页num保存-->jquery获取该值并修改
+	
+	登录验证示例代码：
+		user_info={       
+			'user1':'pwd1',
+			'user2':'pwd2'
+		}
+			
+		def index(request):
+			c = request.COOKIES.get('username') #获取cookie值
+			if not c:
+				return redirect('/login/')     #不存在
+			else:
+				return render(request,'index.html',{'username':c})
+
+		def login(request):
+			if request.method == "GET":
+				return render(request,'login.html')     #登陆页面
+			elif request.method == "POST":
+				u = request.POST.get('user')
+				p = request.POST.get('pwd')
+				dic = user_info.get(u)
+				if not dic:                             #账户不存在
+					return render(request,"login.html")
+				if dic == p:
+					res = redirect('/index/')           #首页
+					res.set_cookie('username',u)        #设置cookie
+					return res
+				else:
+					return render(request,"login.html") #密码错误
+
+7、session
+	Cookie弊端:基于Cookie做用户验证时,敏感信息不适合放在cookie中
+	
+    a. Session原理
+		Cookie是保存在用户浏览器端的键值对
+		Session是保存在服务器端的键值对    
+		Session:{
+			随机字符串1:{    
+				"is_login":True
+				"username":username
+				....
+			},
+			随机字符串2:{    
+				"is_login":True
+				"username":username
+				....
+			},
+		}
+		随机字符串1保存在Session和Cookie中
+		
+    b. Cookie和Session对比
+		https://www.cnblogs.com/andy-zhou/p/5360107.html
+    
+    c. Session配置
+		在chrome浏览器的network-cookies能够查看到sessionid:随机字符串。
+		
+		#生成随机字符串
+		#写到用户浏览器cookie
+		#保存到Session中
+		#在随机字符串对应的字典中设置相关内容
+		--->request.session['Is_login'] = True
+		
+		#获取当前随机字符串
+		#根据随机字符串获取对应信息
+		--->if request.session['Is_login']:
+		
+		代码示例:
+		user_info={
+			'user1':'pwd1',
+			'user2':'pwd2'
+		}
+		def index(request):
+			#if request.session['Is_login']:
+			if reqeust.session.get('Is_login',None):
+				print(request.session.session_key)  --> 打印session_key ,就是随机字符串,可以通过chrome-sessionid查看
+				return HttpResponse(request.session['username'])
+			else:
+				return HttpResponse('gun')
+		def login(request):
+			if request.method == "GET":
+				return render(request,'login.html')   #登陆页面
+			elif request.method == "POST":
+				u = request.POST.get('user')  
+				p = request.POST.get('pwd')
+				dic = user_info.get(u)
+				if not dic:                             #账户不存在
+					return render(request,"login.html")
+				if dic == p:
+					request.session['username'] = u    -->设置session
+					request.session['Is_login'] = True
+					return redirect('/index/')          #首页
+				else:
+					return render(request,"login.html") #密码错误
+	
+	d. 使用:
+        request.session['k1']                #获取值
+        request.session.get('k1',None)       #获取值
+        request.session['k1'] = 123          #设置值
+        request.session.setdefault('k1',123) #存在则不设置
+        del request.session['k1']            #删除Session中数据
+		
+		-->前端也可以通过request.session.username得到数据
+		
+        request.session.keys()
+        request.session.values()
+        request.session.items()
+ 
+        # 用户session的随机字符串
+        request.session.session_key
+ 
+        # 将所有Session失效日期小于当前日期的数据删除
+        request.session.clear_expired()   -->删除超时的session
+		expire_date --> 数据库中有该列,表示失效时间
+ 
+        # 检查 用户session的随机字符串 在数据库中是否
+        request.session.exists("session_key")
+ 
+        # 删除当前用户的所有Session数据
+        request.session.delete("session_key") 
+		reqeust.session.clear()  -->注销(clear是获取session_key并传给delete)
+ 
+        request.session.set_expiry(value) -->人为的设置超时时间
+            * 如果value是个整数，session会在些秒数后失效。
+            * 如果value是个datatime或timedelta，session就会在这个时间后失效。
+            * 如果value是0,用户关闭浏览器session就会失效。
+            * 如果value是None,session会依赖全局session失效策略。
+		
+		session默认超时时间为2周,且关闭浏览器不失效
+		
+    e. 示例：实现一周自动登陆
+            - request.session.set_expiry(1209600/2)
+            - SESSION_SAVE_EVERY_REQUEST = True  #每一次用户操作后需要重新设置超时时间
+
+    PS: cookie中不设置超时时间，则表示关闭浏览器自动清除
+		
+	- 配置文件中设置默认操作（通用配置,可以在在setting.py中配置）：
+		SESSION_COOKIE_NAME ＝ "sessionid"                       # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
+		SESSION_COOKIE_PATH ＝ "/"                               # Session的cookie保存的路径（默认）
+		SESSION_COOKIE_DOMAIN = None                             # Session的cookie保存的域名（默认）
+		SESSION_COOKIE_SECURE = False                            # 是否Https传输cookie（默认）
+		SESSION_COOKIE_HTTPONLY = True                           # 是否Session的cookie只支持http传输（默认）
+		SESSION_COOKIE_AGE = 1209600                             # Session的cookie失效日期（2周）（默认）
+		SESSION_EXPIRE_AT_BROWSER_CLOSE = False                  # 是否关闭浏览器使得Session过期（默认）
+		SESSION_SAVE_EVERY_REQUEST = False                       # 是否每次请求都保存Session，默认修改之后才保存（默认）,每一次用户操作后需要重新设置超时时间
+
+	- 引擎的配置
+		1.数据库
+			SESSION_ENGINE = 'django.contrib.sessions.backends.db'   # Django默认支持Session，并且默认是将Session数据存储在数据库中的django_session表中,使用session前要先生成数据库。
+		2.缓存
+			SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # 引擎
+			SESSION_CACHE_ALIAS = 'default'                            # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
+		3.文件
+			SESSION_ENGINE = 'django.contrib.sessions.backends.file'    # 引擎
+			SESSION_FILE_PATH = None                                    # 缓存文件路径，如果为None，则使用tempfile模块获取一个临时地址tempfile.gettempdir()                                                            # 如：/var/folders/d3/j9tj0gz93dg06bmwxmhh6_xm0000gn/T
+ 		4.缓存+数据库(持久化+提高效率)
+			SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'        # 引擎
+		5.加密session
+			SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'   # 引擎
+	
+8、Form验证
+	- 有验证功能
+		Django Admin
+	- 无验证功能：
+		User.objects.create(username='root',email='asdfasdfasdfasdf')
+		User.objects.filter(id=1).update(email='666')
+		完成：
+		- 验证用户请求
+		- 生成HTML
+		  （保留上一次提交的数据）
+		
+	自定义：
+		- 类
+		- 字段（校验）
+		- 插件（生成HTML）
+		
+	初始化操作：
+
+9、信号
+	- 内置信号
+	- 自定义
+		 - 定义信号
+		 - 出发信号
+		 - 信号中注册函数    
+	
+10、Model操作
+    a. 字段类型 + 参数
+
+    b. 连表字段 + 参数
+
+    c. Meta
+
+    d. SQL操作：
+        - 基本增删改查
+        - 进阶操作
+        - 正反查询
+        - 其他操作
+
+    e. 验证（弱）
