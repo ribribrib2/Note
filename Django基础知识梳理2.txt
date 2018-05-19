@@ -10,6 +10,22 @@ Model：http://www.cnblogs.com/wupeiqi/articles/6216618.html
 	python manage.py makemigrations  #根据app下的migrations目录中的记录，检测当前model层代码是否发生变化
     python manage.py migrate         #把orm代码转换成sql语句去数据库执行
 	
+	Model操作
+    a. 字段类型 + 参数
+
+    b. 连表字段 + 参数
+
+    c. Meta
+
+    d. SQL操作：
+        - 基本增删改查
+        - 进阶操作
+        - 正反查询
+        - 其他操作
+
+    e. 验证（弱）
+	
+	
 2、装饰器 -->cookie的用户登录验证
 	FBV:
 		def auth(func):
@@ -43,6 +59,40 @@ Model：http://www.cnblogs.com/wupeiqi/articles/6216618.html
 3、分页（自定义的分页）
 		
 4、 中间件
+    -什么是中间件
+		我们从浏览器发出一个请求Request，响应的内容HttpResponse。request请求过来时经过所有中间件的process_request，response返回经过所有中间件的process_response。
+		
+	-自定义中间件
+		新建一个middle文件夹,下面新建一个middle_ware.py文件,里面定义一个类(继承)row,然后在setting.py的MIDDLEWARE中注册middle.middle_ware.row.
+			from django.utils.deprecation import MiddlewareMixin
+			class row(MiddlewareMixin):
+				def process_request(self,request):
+					//每一个请求都是先通过中间件中的process_request，如果返回None，继续处理其它中间件，如果有return，就处理中止，返回到网页上。
+					print("process_request")
+					return Httpresponse('结束') -->如果添加该句,则处理中止.
+					
+				def process_view(self,request,view_func,view_func_args,view_func_kwargs): 
+					//执行完所有的process_request函数,然后进行路由匹配,匹配完后返回执行每一个中间件的process_view
+					//view_func-->view函数
+					//view_func_args|view_func_kwargs-->传给view函数的参数
+					
+				def process_response(self,request,response):
+					//response返回执行,最后一定要加return
+					return response
+				
+				def process_exception(self,resquest,exception):
+					//view函数如果执行出错执行该函数.exception为异常信息.
+					if isinstance(exception,ValueError):
+						//异常处理
+						return Httpresponse('出现异常')
+				
+				def process_template_respone(self,request,response):
+					//如果view中的函数返回对象中有render方法则执行.
+					pass
+					
+	-流程
+		每一个请求都是从上到下依次执行所有中间件的process_request,然后进行路由匹配,匹配完后返回顶部从上到下依次执行每一个中间件的process_view,然后执行view函数,如果执行正常,response返回并从下到上依次执行process_response.如果异常,从下到上依次执行每一个中间件的process_exception.
+
 	- XSS攻击：
 		{{ page_str|safe }}
 		mark_safe(page_str)
@@ -116,11 +166,126 @@ Model：http://www.cnblogs.com/wupeiqi/articles/6216618.html
 				2.input中找到name=csrfmiddlewaretoken和cookie中找到key=csrftoken是不一样的?
 
 5、缓存
-	5种配置
+	-为什么需要缓存
+		由于Django是动态网站，所有每次请求均会去数据进行相应的操作，当程序访问量大时，耗时必然会更加明显，最简单解决方式是使用：缓存，缓存将一个某个views的返回值保存至内存或者memcache中，5分钟内再有人来访问时，则不再去执行view中的操作，而是直接从内存或者Redis中之前缓存的内容拿到，并返回。
+	
+	- Django中缓存配置：
+		CACHES = {
+			'default': {
+				# 开发调试(此为开始调试用，实际内部不做任何操作)
+				'BACKEND': 'django.core.cache.backends.dummy.DummyCache',            
+				
+				# 内存(此缓存将内容保存至内存的变量中)
+				'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',          
+				'LOCATION': 'unique-snowflake',
+				
+				# 文件(此缓存将内容保存至文件)
+				'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',    
+				'LOCATION': '/var/tmp/django_cache',
+				
+				# 数据库(此缓存将内容保存至数据库),执行创建表命令 python manage.py createcachetable
+				'BACKEND': 'django.core.cache.backends.db.DatabaseCache',            
+				'LOCATION': 'my_cache_table', # 数据库表
+				
+				# memcache(缓存使用python-memcached模块连接memcache)
+				'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+				'LOCATION': '127.0.0.1:11211',            -->三选一
+				'LOCATION': 'unix:/tmp/memcached.sock',   -->三选一
+				'LOCATION': [                             -->三选一
+					'172.19.26.240:11211',
+					'172.19.26.242:11211',
+				] 
+				
+				# memcache(缓存使用pylibmc模块连接memcache)
+				'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+				'LOCATION': '127.0.0.1:11211',            -->三选一
+				'LOCATION': 'unix:/tmp/memcached.sock',   -->三选一
+				'LOCATION': [                             -->三选一
+					('172.19.26.240:11211',10),           -->权重
+					('172.19.26.242:11211',1),            -->权重
+				] 
+				
+				# redis(使用pip3 install django-redis安装)
+				"BACKEND": "django_redis.cache.RedisCache",
+				"LOCATION": "redis://127.0.0.1:6379",
+				"OPTIONS": {
+					"CLIENT_CLASS": "django_redis.client.DefaultClient",
+					"CONNECTION_POOL_KWARGS": {"max_connections": 100}
+					# "PASSWORD": "密码",
+				}
+				--> 视图中链接并操作
+					from django_redis import get_redis_connection
+					conn = get_redis_connection("default")
+				
+				#通用配置
+				'TIMEOUT': 300,                                                      # 缓存超时时间（默认300，None表示永不过期，0表示立即过期）
+				'OPTIONS':{
+					'MAX_ENTRIES': 300,                                              # 最大缓存个数（默认300）
+					'CULL_FREQUENCY': 3,                                             # 缓存到达最大个数之后，剔除缓存个数的比例，即：1/CULL_FREQUENCY（默认3）
+				},
+				#下面三个参数定义缓存中的key
+				'KEY_PREFIX': '',                                                    # 缓存key的前缀（默认空）
+				'VERSION': 1,                                                        # 缓存key的版本（默认1）
+				'KEY_FUNCTION' 函数名(可以是自定义函数)                              # 生成key的函数（默认函数会生成为：【前缀:版本:key】）
+			}
+		}
+		# 自定义key
+		def default_key_func(key, key_prefix, version):
+			"""
+			Default function to generate keys.
+
+			Constructs the key used by all other methods. By default it prepends
+			the `key_prefix'. KEY_FUNCTION can be used to specify an alternate
+			function with custom key making behavior.
+			"""
+			return '%s:%s:%s' % (key_prefix, version, key)
+
+		def get_key_func(key_func):
+			"""
+			Function to decide which key function to use.
+
+			Defaults to ``default_key_func``.
+			"""
+			if key_func is not None:
+				if callable(key_func):
+					return key_func
+				else:
+					return import_string(key_func)
+			return default_key_func
+	
 	3种应用：
-		全局
-		视图函数
-		模板
+		全局:
+			使用中间件，经过一系列的认证等操作，如果内容在缓存中存在，则使用FetchFromCacheMiddleware获取内容并返回给用户，当返回给用户之前，判断缓存中是否已经存在，如果不存在则UpdateCacheMiddleware会将缓存保存至缓存，从而实现全站缓存
+			MIDDLEWARE = [
+				'django.middleware.cache.UpdateCacheMiddleware',    -->放在最前面,给用户前写入缓存
+				# 其他中间件...
+				'django.middleware.cache.FetchFromCacheMiddleware', -->放在最后,要先通过认证
+			]
+			CACHE_MIDDLEWARE_ALIAS = ""
+			CACHE_MIDDLEWARE_SECONDS = ""
+			CACHE_MIDDLEWARE_KEY_PREFIX = ""
+			
+		单独视图缓存:
+		    方式一：
+				from django.views.decorators.cache import cache_page
+				@cache_page(10)        -->缓存10秒
+				def my_view(request):
+					...
+			方式二：
+				from django.views.decorators.cache import cache_page
+
+				urlpatterns = [
+					url(r'^foo/([0-9]{1,2})/$', cache_page(60 * 15)(my_view)),
+				]
+				模板
+		局部视图缓存:
+			a. 引入TemplateTag
+				{% load cache %}
+			b. 使用缓存
+				{% cache 10 缓存key %} -->缓存10秒
+					缓存内容
+				{% endcache %}
+
 	
 6、cookie
 	客户端浏览器上的一个文件：键值对 {"user": 'dachengzi'}
@@ -334,24 +499,66 @@ Model：http://www.cnblogs.com/wupeiqi/articles/6216618.html
 		
 	初始化操作：
 
-9、信号
-	- 内置信号
+9、信号-->钩子
+    - 内置信号
+		Model signals
+			pre_init                    # django的modal执行其构造方法前，自动触发
+			post_init                   # django的modal执行其构造方法后，自动触发
+			pre_save                    # django的modal对象保存前，自动触发
+			post_save                   # django的modal对象保存后，自动触发
+			pre_delete                  # django的modal对象删除前，自动触发
+			post_delete                 # django的modal对象删除后，自动触发
+			m2m_changed                 # django的modal中使用m2m字段操作第三张表（add,remove,clear）前后，自动触发
+			class_prepared              # 程序启动时，检测已注册的app中modal类，对于每一个类，自动触发
+		Management signals
+			pre_migrate                 # 执行migrate命令前，自动触发
+			post_migrate                # 执行migrate命令后，自动触发
+		Request/response signals
+			request_started             # 请求到来前，自动触发
+			request_finished            # 请求结束后，自动触发
+			got_request_exception       # 请求异常后，自动触发
+		Test signals
+			setting_changed             # 使用test测试修改配置文件时，自动触发
+			template_rendered           # 使用test测试渲染模板时，自动触发
+		Database Wrappers
+			connection_created          # 创建数据库连接时，自动触发
+		
+	- 内置信号使用		
+		from django.core.signals import request_finished
+		from django.core.signals import request_started
+		from django.core.signals import got_request_exception
+		from django.db.models.signals import class_prepared
+		from django.db.models.signals import pre_init, post_init
+		from django.db.models.signals import pre_save, post_save
+		from django.db.models.signals import pre_delete, post_delete
+		from django.db.models.signals import m2m_changed
+		from django.db.models.signals import pre_migrate, post_migrate
+		from django.test.signals import setting_changed
+		from django.test.signals import template_rendered
+		from django.db.backends.signals import connection_created
+
+		def callback(sender, **kwargs):
+			print("xxoo_callback")
+			print(sender,kwargs)
+
+		pre_init.connect(callback)
+		
+		在setting.py所在的目录下的__init__.py中import上面这个py文件
+		
 	- 自定义
-		 - 定义信号
-		 - 出发信号
-		 - 信号中注册函数    
-	
-10、Model操作
-    a. 字段类型 + 参数
-
-    b. 连表字段 + 参数
-
-    c. Meta
-
-    d. SQL操作：
-        - 基本增删改查
-        - 进阶操作
-        - 正反查询
-        - 其他操作
-
-    e. 验证（弱）
+		- 定义信号
+			import django.dispatch
+			pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"]) -->定义信号,pizza_done是信号名,括号中可以传递参数
+		- 注册信号
+			def callback(sender, **kwargs):
+				print("callback")
+				print(sender,kwargs)
+			pizza_done.connect(callback)
+		- 触发信号
+			from 路径 import pizza_done
+			def home(request):
+				pizza_done.send(sender='seven', toppings=123, size=456)
+				return HttpResponse('ok')
+			-->执行home的时候打印:
+				callback
+				seven {'signal': <django.dispatch.dispatcher.Signal object at 0x05C74250>, 'toppings': 123, 'size': 456}
